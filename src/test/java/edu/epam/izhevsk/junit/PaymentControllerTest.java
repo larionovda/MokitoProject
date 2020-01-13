@@ -42,7 +42,7 @@ public class PaymentControllerTest {
     }
 
     @Test
-    public void Test1() throws InsufficientFundsException {
+    public void CheckMethodIsUserAuthenticatedOneTime() throws InsufficientFundsException {
         when(accountServiceMock.isUserAuthenticated(anyLong())).thenReturn(true);
         when(depositServiceMock.deposit(eq(50L), anyLong())).thenReturn("Success");
         paymentController.deposit(50L, 100L);
@@ -50,14 +50,14 @@ public class PaymentControllerTest {
     }
 
     @Test(expected = SecurityException.class)
-    public void Test2() throws InsufficientFundsException {
+    public void whenIsUserAuthenticatedThrowException() throws InsufficientFundsException {
         when(accountServiceMock.isUserAuthenticated(100L)).thenReturn(true);
         when(depositServiceMock.deposit(50L, 100L)).thenReturn("Success");
         paymentController.deposit(50L, 99L);
     }
 
     @Test(expected = InsufficientFundsException.class)
-    public void Test3() throws InsufficientFundsException {
+    public void whenDepositThrowException() throws InsufficientFundsException {
         when(accountServiceMock.isUserAuthenticated(anyLong())).thenReturn(true);
         when(depositServiceMock.deposit(gt(100L), anyLong())).thenThrow(new InsufficientFundsException());
         paymentController.deposit(101L, 10L);
