@@ -21,7 +21,7 @@ public class PaymentControllerTest {
     DepositService depositServiceMock;
 
     @InjectMocks
-    PaymentController paymentController = new PaymentController(accountServiceMock, depositServiceMock);
+    PaymentController paymentController;
 
     @Test
     public void whenUserId100ReturnTrue() {
@@ -37,7 +37,7 @@ public class PaymentControllerTest {
 
     @Test(expected = InsufficientFundsException.class)
     public void whenDepositNotNormalReturnTrue() throws InsufficientFundsException {
-        when(depositServiceMock.deposit(gt(100L), anyLong())).thenThrow(InsufficientFundsException.class);
+        when(depositServiceMock.deposit(gt(100L), anyLong())).thenThrow(new InsufficientFundsException());
         depositServiceMock.deposit(200L, 100L);
     }
 
@@ -51,15 +51,15 @@ public class PaymentControllerTest {
 
     @Test(expected = SecurityException.class)
     public void Test2() throws InsufficientFundsException {
-        when(accountServiceMock.isUserAuthenticated(10L)).thenReturn(false);
+        when(accountServiceMock.isUserAuthenticated(100L)).thenReturn(true);
         when(depositServiceMock.deposit(50L, 100L)).thenReturn("Success");
-        paymentController.deposit(50L, 100L);
+        paymentController.deposit(50L, 99L);
     }
 
     @Test(expected = InsufficientFundsException.class)
     public void Test3() throws InsufficientFundsException {
         when(accountServiceMock.isUserAuthenticated(anyLong())).thenReturn(true);
-        when(depositServiceMock.deposit(gt(100L), anyLong())).thenThrow(InsufficientFundsException.class);
+        when(depositServiceMock.deposit(gt(100L), anyLong())).thenThrow(new InsufficientFundsException());
         paymentController.deposit(101L, 10L);
     }
 
